@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>С Днём Рождения, Никита! 🎉</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d0d1a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ── Конфетти ── */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: radial-gradient(ellipse at center, #1a0533 0%, #0d0d1a 70%);
+    }
+
+    .hero .emoji-big {
+      font-size: 5rem;
+      animation: bounce 1.2s infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-18px); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      margin: 1rem 0 0.5rem;
+      background: linear-gradient(90deg, #ff6fd8, #ffd700, #7ef7ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+      background-size: 200%;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 0% }
+      100% { background-position: 200% }
+    }
+
+    .hero p.subtitle {
+      font-size: 1.25rem;
+      color: #ccc;
+      max-width: 560px;
+      line-height: 1.7;
+      margin-top: 0.75rem;
+    }
+
+    .scroll-hint {
+      margin-top: 2.5rem;
+      font-size: 0.9rem;
+      color: #888;
+      animation: fadeInUp 1s 1.5s both;
+    }
+
+    .scroll-hint span {
+      font-size: 1.4rem;
+      display: block;
+      animation: bounce 1s infinite alternate;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Пожелания ── */
+    .wishes {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      background: #0d0d1a;
+    }
+
+    .wish-card {
+      background: linear-gradient(135deg, #1e1040, #2a0a4a);
+      border: 1px solid #5a2d8a;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      max-width: 280px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .wish-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(180, 80, 255, 0.35);
+    }
+
+    .wish-card .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .wish-card h3 { font-size: 1.1rem; color: #e0aaff; margin-bottom: 0.4rem; }
+    .wish-card p  { font-size: 0.9rem; color: #bbb; line-height: 1.6; }
+
+    /* ── Игра ── */
+    .game-section {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 1.5rem 3rem;
+      background: radial-gradient(ellipse at center, #0a1a33 0%, #0d0d1a 80%);
+      text-align: center;
+    }
+
+    .game-section h2 {
+      font-size: 2rem;
+      margin-bottom: 0.4rem;
+      color: #ffd700;
+    }
+
+    .game-section .game-desc {
+      color: #aaa;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    .game-hud {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      color: #ccc;
+    }
+
+    .game-hud .val {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    #game-canvas {
+      display: block;
+      margin: 0 auto;
+      border-radius: 16px;
+      border: 2px solid #2a1a5a;
+      background: #07071a;
+      touch-action: none;
+    }
+
+    .game-start-overlay {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .game-btn {
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #7c3aed, #2563eb);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      padding: 0.8rem 2.5rem;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .game-btn:hover { opacity: 0.85; }
+
+    .game-over-box {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    .game-over-box .go-emoji { font-size: 3.5rem; }
+    .game-over-box h3 { font-size: 1.4rem; color: #ffd700; }
+    .game-over-box p  { color: #aaa; font-size: 0.95rem; }
+
+    .play-again-btn {
+      background: linear-gradient(90deg, #ff6fd8, #ffd700);
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-weight: bold;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .play-again-btn:hover { opacity: 0.85; }
+
+    /* Мобильные кнопки */
+    .mobile-controls {
+      display: none;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 0.75rem;
+    }
+
+    .mob-btn {
+      background: #1e1040;
+      border: 2px solid #5a2d8a;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 2rem;
+      width: 70px;
+      height: 70px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 600px) {
+      .mobile-controls { display: flex; }
+    }
+
+    /* ── Фотогалерея ── */
+    .gallery-section {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 1.5rem 4rem;
+      background: #0d0d1a;
+      text-align: center;
+    }
+
+    .gallery-section h2 {
+      font-size: 2rem;
+      color: #ff6fd8;
+      margin-bottom: 0.4rem;
+    }
+
+    .gallery-section .gallery-sub {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 3rem;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) {
+      .photo-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    }
+    @media (max-width: 420px) {
+      .photo-grid { grid-template-columns: 1fr; }
+    }
+
+    .photo-card {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #111;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.3s;
+    }
+
+    .photo-card:hover {
+      transform: scale(1.04) rotate(-1deg);
+      box-shadow: 0 16px 40px rgba(255, 111, 216, 0.3);
+    }
+
+    .photo-card:nth-child(even):hover {
+      transform: scale(1.04) rotate(1deg);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.88);
+      transition: filter 0.3s;
+    }
+
+    .photo-card:hover img {
+      filter: brightness(1);
+    }
+
+    .photo-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      padding: 2rem 1rem 0.9rem;
+      transform: translateY(4px);
+      transition: transform 0.3s;
+    }
+
+    .photo-card:hover .photo-caption {
+      transform: translateY(0);
+    }
+
+    .photo-caption .cap-tag {
+      display: inline-block;
+      background: #ff6fd8;
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 99px;
+      padding: 2px 8px;
+      margin-bottom: 0.3rem;
+    }
+
+    .photo-caption p {
+      font-size: 0.88rem;
+      color: #eee;
+      line-height: 1.4;
+    }
+
+    /* Лайтбокс */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 16px;
+      box-shadow: 0 0 60px rgba(255,111,216,0.3);
+      object-fit: contain;
+    }
+
+    .lightbox-caption {
+      color: #eee;
+      font-size: 1rem;
+      text-align: center;
+      max-width: 500px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 1.2rem; right: 1.5rem;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .lightbox-close:hover { opacity: 1; }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2.5rem;
+      color: #fff;
+      cursor: pointer;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      border-radius: 50%;
+      width: 52px; height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .lightbox-nav:hover { background: rgba(255,255,255,0.18); }
+    .lightbox-nav.prev { left: 1rem; }
+    .lightbox-nav.next { right: 1rem; }
+
+    /* ── Таймер ── */
+    .timer-section {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 1.5rem;
+      background: radial-gradient(ellipse at center, #0d1f0d 0%, #0d0d1a 80%);
+      text-align: center;
+    }
+
+    .timer-section h2 {
+      font-size: 1.8rem;
+      color: #34d399;
+      margin-bottom: 0.4rem;
+    }
+
+    .timer-section .timer-sub {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .timer-grid {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .timer-box {
+      background: linear-gradient(135deg, #0a2a1a, #0d1f0d);
+      border: 1px solid #22c55e44;
+      border-radius: 20px;
+      padding: 1.5rem 2rem;
+      min-width: 110px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timer-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, #22c55e18, transparent 70%);
+    }
+
+    .timer-num {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #34d399;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 20px #22c55e88;
+    }
+
+    .timer-label {
+      font-size: 0.75rem;
+      color: #4ade80;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 0.4rem;
+      opacity: 0.7;
+    }
+
+    /* ── Факты ── */
+    .facts-section {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 1.5rem;
+      background: #0d0d1a;
+      text-align: center;
+    }
+
+    .facts-section h2 {
+      font-size: 1.8rem;
+      color: #7ef7ff;
+      margin-bottom: 0.4rem;
+    }
+
+    .facts-section .facts-sub {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .fact-card {
+      background: #0e0e22;
+      border: 1px solid #1e2a4a;
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fact-card:hover {
+      border-color: #7ef7ff55;
+      box-shadow: 0 8px 24px rgba(126,247,255,0.1);
+    }
+
+    .fact-card.revealed {
+      border-color: #7ef7ff88;
+    }
+
+    .fact-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .fact-num {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #7ef7ff;
+      opacity: 0.25;
+      min-width: 2rem;
+      transition: opacity 0.3s;
+    }
+
+    .fact-card.revealed .fact-num { opacity: 1; }
+
+    .fact-emoji { font-size: 1.6rem; }
+
+    .fact-question {
+      font-size: 0.9rem;
+      color: #aaa;
+      line-height: 1.5;
+    }
+
+    .fact-answer {
+      font-size: 0.95rem;
+      color: #7ef7ff;
+      line-height: 1.5;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease, opacity 0.4s;
+      opacity: 0;
+    }
+
+    .fact-card.revealed .fact-answer {
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    .fact-hint {
+      font-size: 0.72rem;
+      color: #444;
+      margin-top: 0.5rem;
+      transition: opacity 0.3s;
+    }
+
+    .fact-card.revealed .fact-hint { opacity: 0; }
+
+    /* ── Фейерверк ── */
+    .firework-section {
+      position: relative;
+      z-index: 1;
+      padding: 3rem 1.5rem;
+      background: #0d0d1a;
+      text-align: center;
+    }
+
+    #fw-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 500;
+      display: none;
+    }
+
+    .fw-btn {
+      background: linear-gradient(135deg, #ff6fd8, #ffd700, #7ef7ff);
+      background-size: 200%;
+      animation: shimmer 3s linear infinite;
+      border: none;
+      border-radius: 99px;
+      color: #000;
+      font-weight: 900;
+      font-size: 1.2rem;
+      padding: 1rem 3rem;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(255,111,216,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .fw-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 50px rgba(255,111,216,0.8);
+    }
+
+    .fw-btn:active { transform: scale(0.97); }
+
+    /* ── Финал ── */
+    .finale {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 1.5rem;
+      text-align: center;
+      background: linear-gradient(180deg, #0d0d1a 0%, #1a0533 100%);
+    }
+
+    .finale h2 {
+      font-size: clamp(1.8rem, 5vw, 3.5rem);
+      background: linear-gradient(90deg, #ffd700, #ff6fd8, #7ef7ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .finale p {
+      color: #bbb;
+      margin-top: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .cake-anim {
+      font-size: 5rem;
+      display: inline-block;
+      animation: sway 4s ease-in-out infinite;
+    }
+
+    @keyframes sway {
+      0%   { transform: rotate(-5deg) scale(1); }
+      50%  { transform: rotate(5deg) scale(1.1); }
+      100% { transform: rotate(-5deg) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="emoji-big">🎂</div>
+  <h1>С Днём Рождения,<br>Никита!</h1>
+  <p class="subtitle">
+    Сегодня особенный день — твой день! Пусть этот год принесёт тебе
+    кучу крутых моментов, новых побед и незабываемых приключений. 🚀
+  </p>
+  <div class="scroll-hint">
+    Листай вниз, там кое-что интересное
+    <span>↓</span>
+  </div>
+</section>
+
+<!-- Пожелания -->
+<section class="wishes">
+  <div class="wish-card">
+    <div class="icon">💪</div>
+    <h3>Сила и здоровье</h3>
+    <p>Пусть энергии хватает на все задумки, а здоровье никогда не подводит!</p>
+  </div>
+  <div class="wish-card">
+    <div class="icon">🎯</div>
+    <h3>Цели и мечты</h3>
+    <p>Пусть каждая цель достигается, а мечты становятся реальностью быстрее, чем ожидаешь.</p>
+  </div>
+  <div class="wish-card">
+    <div class="icon">😂</div>
+    <h3>Смех и радость</h3>
+    <p>Больше поводов смеяться, меньше поводов грустить. Ты это заслуживаешь!</p>
+  </div>
+  <div class="wish-card">
+    <div class="icon">🌍</div>
+    <h3>Новые горизонты</h3>
+    <p>Новые места, новые люди, новые впечатления — пусть мир открывается с лучших сторон.</p>
+  </div>
+  <div class="wish-card">
+    <div class="icon">🤝</div>
+    <h3>Верные друзья</h3>
+    <p>Рядом всегда те, кто поддержит в любой ситуации — и в радости, и в трудный момент.</p>
+  </div>
+  <div class="wish-card">
+    <div class="icon">🔥</div>
+    <h3>Вдохновение</h3>
+    <p>Пусть каждый день приносит что-то новое и зажигает огонь внутри!</p>
+  </div>
+</section>
+
+<!-- Игра -->
+<section class="game-section">
+  <h2>🎮 Лови подарки, Никита!</h2>
+  <p class="game-desc">Двигай корзину мышкой (или стрелками) и лови тортики 🎂 Не пропусти — 3 промаха и конец!</p>
+
+  <div class="game-hud">
+    <div>Счёт: <span class="val" id="score-val">0</span></div>
+    <div>Рекорд: <span class="val" id="best-val">0</span></div>
+    <div>Жизни: <span class="val" id="lives-val">❤️❤️❤️</span></div>
+  </div>
+
+  <div class="game-start-overlay" id="start-overlay">
+    <button class="game-btn" id="start-btn" onclick="startGame()">▶ Начать игру</button>
+  </div>
+
+  <canvas id="game-canvas" width="560" height="380"></canvas>
+
+  <div class="mobile-controls" id="mob-controls">
+    <button class="mob-btn" id="mob-left">◀</button>
+    <button class="mob-btn" id="mob-right">▶</button>
+  </div>
+
+  <div class="game-over-box" id="game-over-box">
+    <div class="go-emoji" id="go-emoji"></div>
+    <h3 id="go-title"></h3>
+    <p id="go-desc"></p>
+    <button class="play-again-btn" onclick="startGame()">Ещё раз! 🔄</button>
+  </div>
+</section>
+
+<!-- Фотогалерея -->
+<section class="gallery-section">
+  <h2>📸 Никита в своей стихии</h2>
+  <p class="gallery-sub">Документальные свидетельства жизни легенды</p>
+
+  <div class="photo-grid">
+
+    <div class="photo-card" onclick="openLightbox(0)">
+      <img src="photo1.jpg" alt="Никита в зале" />
+      <div class="photo-caption">
+        <span class="cap-tag">🏋️ Зал</span>
+        <p>«Тренировка окончена. Я победил гравитацию.»</p>
+      </div>
+    </div>
+
+    <div class="photo-card" onclick="openLightbox(1)">
+      <img src="photo2.jpg" alt="Никита в электричке" />
+      <div class="photo-caption">
+        <span class="cap-tag">🚆 В пути</span>
+        <p>Едет куда-то. Куда — неважно. Главное — с видом.</p>
+      </div>
+    </div>
+
+    <div class="photo-card" onclick="openLightbox(2)">
+      <img src="photo3.jpg" alt="Никита в магазине" />
+      <div class="photo-caption">
+        <span class="cap-tag">🏨 Магазин</span>
+        <p>«Штаны? Не слышал. Я свободный человек.»</p>
+      </div>
+    </div>
+
+    <div class="photo-card" onclick="openLightbox(3)">
+      <img src="photo4.jpg" alt="Никита в тренажёре с телефоном" />
+      <div class="photo-caption">
+        <span class="cap-tag">📱 Многозадачность</span>
+        <p>Жмёт ногами и листает ленту. Профессионал.</p>
+      </div>
+    </div>
+
+    <div class="photo-card" onclick="openLightbox(4)">
+      <img src="photo6.jpg" alt="Никита в машине" />
+      <div class="photo-caption">
+        <span class="cap-tag">🚗 Поездка</span>
+        <p>Смотрит на мир с прищуром. Мир нервничает.</p>
+      </div>
+    </div>
+
+    <div class="photo-card" onclick="openLightbox(6)">
+      <img src="photo8.jpg" alt="Красоточка" />
+      <div class="photo-caption">
+        <span class="cap-tag">😍 Стиль</span>
+        <p>Красоточка</p>
+      </div>
+    </div>
+
+    <div class="photo-card photo-card--together" onclick="openLightbox(5)" style="grid-column: 1 / -1; background: #07071a; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
+      <img src="photo7.jpg" alt="Мы вместе на фейерверке" style="width: auto; height: auto; max-width: 100%; max-height: 500px; object-fit: contain; display: block;" />
+      <div class="photo-caption" style="position: relative; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.85));">
+        <span class="cap-tag" style="background: #ffd700;">🎆 Вместе</span>
+        <p>Друзьяшки. Фейерверк. ❤️</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Лайтбокс -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav prev" onclick="navLightbox(-1)">‹</button>
+  <img id="lb-img" src="" alt="" />
+  <div class="lightbox-caption" id="lb-caption"></div>
+  <button class="lightbox-nav next" onclick="navLightbox(1)">›</button>
+</div>
+
+<!-- Таймер -->
+<section class="timer-section">
+  <h2>⏱️ Никита живёт уже...</h2>
+  <p class="timer-sub" id="timer-sub-text">Тикает каждую секунду</p>
+  <div class="timer-grid">
+    <div class="timer-box">
+      <div class="timer-num" id="t-years">0</div>
+      <div class="timer-label">лет</div>
+    </div>
+    <div class="timer-box">
+      <div class="timer-num" id="t-days">0</div>
+      <div class="timer-label">дней</div>
+    </div>
+    <div class="timer-box">
+      <div class="timer-num" id="t-hours">0</div>
+      <div class="timer-label">часов</div>
+    </div>
+    <div class="timer-box">
+      <div class="timer-num" id="t-mins">0</div>
+      <div class="timer-label">минут</div>
+    </div>
+    <div class="timer-box">
+      <div class="timer-num" id="t-secs">0</div>
+      <div class="timer-label">секунд</div>
+    </div>
+  </div>
+</section>
+
+<!-- Факты -->
+<section class="facts-section">
+  <h2>🔍 Досье на Никиту</h2>
+  <p class="facts-sub">Нажми на карточку — узнаешь правду</p>
+  <div class="facts-grid">
+
+    <div class="fact-card" onclick="revealFact(this)">
+      <div class="fact-top">
+        <div class="fact-num">01</div>
+        <div class="fact-emoji">🏋️</div>
+      </div>
+      <div class="fact-question">Его отношения с залом...</div>
+      <div class="fact-answer">Приходит, ложится на пол, фотографируется. Называет это «восстановлением».</div>
+      <div class="fact-hint">👆 нажми чтобы узнать</div>
+    </div>
+
+    <div class="fact-card" onclick="revealFact(this)">
+      <div class="fact-top">
+        <div class="fact-num">02</div>
+        <div class="fact-emoji">📱</div>
+      </div>
+      <div class="fact-question">Его суперспособность...</div>
+      <div class="fact-answer">Может листать телефон в любом положении тела. Горизонтально, вертикально, вверх ногами — без разницы.</div>
+      <div class="fact-hint">👆 нажми чтобы узнать</div>
+    </div>
+
+    <div class="fact-card" onclick="revealFact(this)">
+      <div class="fact-top">
+        <div class="fact-num">03</div>
+        <div class="fact-emoji">🚆</div>
+      </div>
+      <div class="fact-question">В транспорте он...</div>
+      <div class="fact-answer">Занимает место с видом человека, который едет по важным делам. Куда именно — государственная тайна.</div>
+      <div class="fact-hint">👆 нажми чтобы узнать</div>
+    </div>
+
+    <div class="fact-card" onclick="revealFact(this)">
+      <div class="fact-top">
+        <div class="fact-num">04</div>
+        <div class="fact-emoji">😄</div>
+      </div>
+      <div class="fact-question">Его улыбка означает...</div>
+      <div class="fact-answer">Либо он только что придумал что-то гениальное, либо уже сделал что-то, о чём ты узнаешь позже.</div>
+      <div class="fact-hint">👆 нажми чтобы узнать</div>
+    </div>
+
+    <div class="fact-card" onclick="revealFact(this)">
+      <div class="fact-top">
+        <div class="fact-num">05</div>
+        <div class="fact-emoji">👗</div>
+      </div>
+      <div class="fact-question">Его стиль можно описать как...</div>
+      <div class="fact-answer">«Я оденусь когда захочу». Штаны — опционально. Уверенность — обязательно.</div>
+      <div class="fact-hint">👆 нажми чтобы узнать</div>
+    </div>
+
+    <div class="fact-card" onclick="revealFact(this)">
+      <div class="fact-top">
+        <div class="fact-num">06</div>
+        <div class="fact-emoji">🚗</div>
+      </div>
+      <div class="fact-question">В машине он смотрит...</div>
+      <div class="fact-answer">На мир с прищуром философа. Видит то, чего не видят другие. Или просто щурится от солнца.</div>
+      <div class="fact-hint">👆 нажми чтобы узнать</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Фейерверк -->
+<section class="firework-section">
+  <button class="fw-btn" onclick="launchFireworks()">🎆 Запустить фейерверк!</button>
+</section>
+
+<canvas id="fw-canvas"></canvas>
+
+<!-- Финал -->
+<section class="finale">
+  <div class="cake-anim">🎉</div>
+  <h2>Никита, ты лучший!</h2>
+  <p>С днём рождения от всей души. Пусть этот год будет твоим лучшим годом! 🥳</p>
+</section>
+
+<script>
+/* ════════════════════════════════
+   КОНФЕТТИ
+════════════════════════════════ */
+const confCanvas = document.getElementById('confetti-canvas');
+const confCtx    = confCanvas.getContext('2d');
+let pieces = [];
+
+function resizeConf() {
+  confCanvas.width  = window.innerWidth;
+  confCanvas.height = window.innerHeight;
+}
+resizeConf();
+window.addEventListener('resize', resizeConf);
+
+const CONF_COLORS = ['#ff6fd8','#ffd700','#7ef7ff','#a78bfa','#34d399','#f97316'];
+
+function spawnPiece() {
+  return {
+    x: Math.random() * confCanvas.width,
+    y: -10,
+    w: Math.random() * 8 + 4,
+    h: Math.random() * 14 + 6,
+    color: CONF_COLORS[Math.floor(Math.random() * CONF_COLORS.length)],
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.15,
+    vx: (Math.random() - 0.5) * 2,
+    vy: Math.random() * 2 + 1.5,
+  };
+}
+
+for (let i = 0; i < 80; i++) {
+  const p = spawnPiece();
+  p.y = Math.random() * confCanvas.height;
+  pieces.push(p);
+}
+
+function animateConfetti() {
+  confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+  if (pieces.length < 120 && Math.random() < 0.3) pieces.push(spawnPiece());
+  pieces.forEach((p, i) => {
+    confCtx.save();
+    confCtx.translate(p.x, p.y);
+    confCtx.rotate(p.rot);
+    confCtx.fillStyle = p.color;
+    confCtx.globalAlpha = 0.85;
+    confCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    confCtx.restore();
+    p.x += p.vx; p.y += p.vy; p.rot += p.rotSpeed;
+    if (p.y > confCanvas.height + 20) pieces.splice(i, 1);
+  });
+  requestAnimationFrame(animateConfetti);
+}
+animateConfetti();
+
+/* ════════════════════════════════
+   ИГРА — ЛОВИ ПОДАРКИ
+════════════════════════════════ */
+const gc      = document.getElementById('game-canvas');
+const gctx    = gc.getContext('2d');
+
+const GW = gc.width;
+const GH = gc.height;
+
+// Эмодзи для падающих предметов
+const GOOD_ITEMS = ['🎂','🎁','🎈','🍰','⭐','🎊'];
+const BAD_ITEMS  = ['💣','🌧️','😈'];
+
+// Состояние
+let gameRunning = false;
+let score       = 0;
+let lives       = 3;
+let bestScore   = 0;
+let items       = [];
+let particles   = [];
+let spawnTimer  = 0;
+let spawnRate   = 90;   // кадры между спавном
+let speed       = 2.2;
+let frameCount  = 0;
+
+// Корзина
+const BASKET_W = 90;
+const BASKET_H = 28;
+let basketX    = GW / 2 - BASKET_W / 2;
+let targetX    = basketX;
+
+// Мышь / тач
+gc.addEventListener('mousemove', e => {
+  const rect = gc.getBoundingClientRect();
+  const scaleX = GW / rect.width;
+  targetX = (e.clientX - rect.left) * scaleX - BASKET_W / 2;
+});
+
+gc.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const rect = gc.getBoundingClientRect();
+  const scaleX = GW / rect.width;
+  targetX = (e.touches[0].clientX - rect.left) * scaleX - BASKET_W / 2;
+}, { passive: false });
+
+// Клавиатура
+const keys = {};
+window.addEventListener('keydown', e => { keys[e.key] = true; });
+window.addEventListener('keyup',   e => { keys[e.key] = false; });
+
+// Мобильные кнопки
+const mobLeft  = document.getElementById('mob-left');
+const mobRight = document.getElementById('mob-right');
+mobLeft.addEventListener('touchstart',  () => { keys['ArrowLeft']  = true;  }, { passive: true });
+mobLeft.addEventListener('touchend',    () => { keys['ArrowLeft']  = false; });
+mobRight.addEventListener('touchstart', () => { keys['ArrowRight'] = true;  }, { passive: true });
+mobRight.addEventListener('touchend',   () => { keys['ArrowRight'] = false; });
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function spawnItem() {
+  const isGood = Math.random() < 0.78;
+  const emoji  = isGood
+    ? GOOD_ITEMS[Math.floor(Math.random() * GOOD_ITEMS.length)]
+    : BAD_ITEMS [Math.floor(Math.random() * BAD_ITEMS.length)];
+  items.push({
+    x: Math.random() * (GW - 40) + 20,
+    y: -30,
+    emoji,
+    good: isGood,
+    vy: speed + Math.random() * 1.2,
+    size: 32,
+    rot: (Math.random() - 0.5) * 0.4,
+    rotSpeed: (Math.random() - 0.5) * 0.06,
+  });
+}
+
+function spawnParticles(x, y, good) {
+  const color = good ? ['#ffd700','#ff6fd8','#7ef7ff'] : ['#ef4444','#f97316'];
+  for (let i = 0; i < 14; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const spd   = Math.random() * 4 + 1.5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd - 2,
+      color: color[Math.floor(Math.random() * color.length)],
+      life: 1,
+      r: Math.random() * 5 + 3,
+    });
+  }
+}
+
+function updateHUD() {
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('best-val').textContent  = bestScore;
+  const hearts = ['','❤️','❤️❤️','❤️❤️❤️'];
+  document.getElementById('lives-val').textContent = hearts[lives] || '';
+}
+
+function drawBasket(x) {
+  const y = GH - BASKET_H - 8;
+  // Тень
+  gctx.save();
+  gctx.shadowColor = '#a855f7';
+  gctx.shadowBlur  = 18;
+
+  // Корпус корзины
+  const grad = gctx.createLinearGradient(x, y, x, y + BASKET_H);
+  grad.addColorStop(0, '#7c3aed');
+  grad.addColorStop(1, '#4c1d95');
+  gctx.fillStyle = grad;
+  gctx.beginPath();
+  gctx.roundRect(x, y, BASKET_W, BASKET_H, 8);
+  gctx.fill();
+
+  // Полоски на корзине
+  gctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  gctx.lineWidth = 2;
+  for (let i = 1; i < 4; i++) {
+    const lx = x + (BASKET_W / 4) * i;
+    gctx.beginPath();
+    gctx.moveTo(lx, y + 4);
+    gctx.lineTo(lx, y + BASKET_H - 4);
+    gctx.stroke();
+  }
+
+  // Ободок
+  gctx.strokeStyle = '#c084fc';
+  gctx.lineWidth = 2;
+  gctx.beginPath();
+  gctx.roundRect(x, y, BASKET_W, BASKET_H, 8);
+  gctx.stroke();
+
+  gctx.restore();
+}
+
+function drawItem(item) {
+  gctx.save();
+  gctx.translate(item.x, item.y);
+  gctx.rotate(item.rot);
+  gctx.font = `${item.size}px serif`;
+  gctx.textAlign = 'center';
+  gctx.textBaseline = 'middle';
+  gctx.fillText(item.emoji, 0, 0);
+  gctx.restore();
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    gctx.save();
+    gctx.globalAlpha = p.life;
+    gctx.fillStyle = p.color;
+    gctx.beginPath();
+    gctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    gctx.fill();
+    gctx.restore();
+  });
+}
+
+function drawBackground() {
+  // Звёздочки (статичные, рисуем каждый кадр)
+  gctx.fillStyle = '#07071a';
+  gctx.fillRect(0, 0, GW, GH);
+
+  // Пол
+  const floorGrad = gctx.createLinearGradient(0, GH - 8, 0, GH);
+  floorGrad.addColorStop(0, '#2a1a5a');
+  floorGrad.addColorStop(1, '#1a0a3a');
+  gctx.fillStyle = floorGrad;
+  gctx.fillRect(0, GH - 8, GW, 8);
+}
+
+function drawScore() {
+  gctx.save();
+  gctx.font = 'bold 18px Segoe UI';
+  gctx.fillStyle = 'rgba(255,255,255,0.12)';
+  gctx.textAlign = 'center';
+  gctx.restore();
+}
+
+let gameLoopId = null;
+
+function gameLoop() {
+  if (!gameRunning) return;
+
+  frameCount++;
+
+  // Клавиатура
+  if (keys['ArrowLeft']  || keys['a'] || keys['A']) targetX -= 9;
+  if (keys['ArrowRight'] || keys['d'] || keys['D']) targetX += 9;
+  targetX = clamp(targetX, 0, GW - BASKET_W);
+
+  // Плавное движение корзины
+  basketX += (targetX - basketX) * 0.18;
+  basketX  = clamp(basketX, 0, GW - BASKET_W);
+
+  // Спавн
+  spawnTimer++;
+  if (spawnTimer >= spawnRate) {
+    spawnTimer = 0;
+    spawnItem();
+    // Постепенно ускоряем
+    if (spawnRate > 30) spawnRate -= 0.4;
+    speed = Math.min(speed + 0.04, 6);
+  }
+
+  // Обновление предметов
+  const basketY = GH - BASKET_H - 8;
+  items = items.filter(item => {
+    item.y  += item.vy;
+    item.rot += item.rotSpeed;
+
+    // Попадание в корзину
+    if (
+      item.y + item.size / 2 >= basketY &&
+      item.y - item.size / 2 <= basketY + BASKET_H &&
+      item.x >= basketX - 10 &&
+      item.x <= basketX + BASKET_W + 10
+    ) {
+      spawnParticles(item.x, item.y, item.good);
+      if (item.good) {
+        score++;
+        if (score > bestScore) bestScore = score;
+      } else {
+        lives--;
+        if (lives <= 0) { endGame(); return false; }
+      }
+      updateHUD();
+      return false;
+    }
+
+    // Упал мимо
+    if (item.y > GH + 20) {
+      if (item.good) {
+        lives--;
+        spawnParticles(item.x, GH - 10, false);
+        if (lives <= 0) { endGame(); return false; }
+        updateHUD();
+      }
+      return false;
+    }
+    return true;
+  });
+
+  // Частицы
+  particles = particles.filter(p => {
+    p.x  += p.vx;
+    p.y  += p.vy;
+    p.vy += 0.15;
+    p.life -= 0.035;
+    return p.life > 0;
+  });
+
+  // Рисуем
+  drawBackground();
+  drawScore();
+  items.forEach(drawItem);
+  drawParticles();
+  drawBasket(basketX);
+
+  gameLoopId = requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+  score      = 0;
+  lives      = 3;
+  items      = [];
+  particles  = [];
+  spawnTimer = 0;
+  spawnRate  = 90;
+  speed      = 2.2;
+  frameCount = 0;
+  basketX    = GW / 2 - BASKET_W / 2;
+  targetX    = basketX;
+  gameRunning = true;
+
+  document.getElementById('start-overlay').style.display  = 'none';
+  document.getElementById('game-over-box').style.display  = 'none';
+  document.getElementById('mob-controls').style.display   = 'flex';
+  gc.style.display = 'block';
+
+  updateHUD();
+  if (gameLoopId) cancelAnimationFrame(gameLoopId);
+  gameLoop();
+}
+
+function endGame() {
+  gameRunning = false;
+  cancelAnimationFrame(gameLoopId);
+
+  // Финальный кадр с затемнением
+  gctx.fillStyle = 'rgba(0,0,0,0.55)';
+  gctx.fillRect(0, 0, GW, GH);
+
+  const box = document.getElementById('game-over-box');
+  box.style.display = 'flex';
+
+  let emoji, title, desc;
+  if (score >= 30) {
+    emoji = '🏆'; title = 'Легенда!';
+    desc  = `${score} очков — Никита, ты просто машина! 🔥`;
+  } else if (score >= 15) {
+    emoji = '🎯'; title = 'Отличный результат!';
+    desc  = `${score} очков — очень достойно, именинник! 🎉`;
+  } else if (score >= 7) {
+    emoji = '😄'; title = 'Неплохо!';
+    desc  = `${score} очков — разминка засчитана, попробуй ещё!`;
+  } else {
+    emoji = '😅'; title = 'Бывает!';
+    desc  = `${score} очков — в следующий раз точно лучше! 💪`;
+  }
+
+  document.getElementById('go-emoji').textContent = emoji;
+  document.getElementById('go-title').textContent = title;
+  document.getElementById('go-desc').textContent  = desc;
+  document.getElementById('best-val').textContent = bestScore;
+}
+
+// Показываем canvas сразу (пустой), кнопка поверх
+gc.style.display = 'block';
+drawBackground();
+// Надпись на старте
+gctx.font = 'bold 22px Segoe UI';
+gctx.fillStyle = 'rgba(255,255,255,0.25)';
+gctx.textAlign = 'center';
+gctx.fillText('Нажми «Начать игру»!', GW / 2, GH / 2);
+/* ════════════════════════════════
+   ЛАЙТБОКС
+════════════════════════════════ */
+const lbPhotos = [
+  { src: 'photo1.jpg', cap: '🏋️ «Тренировка окончена. Я победил гравитацию.»' },
+  { src: 'photo2.jpg', cap: '🚆 Едет куда-то. Куда — неважно. Главное — с видом.' },
+  { src: 'photo3.jpg', cap: '🏨 «Штаны? Не слышал. Я свободный человек.»' },
+  { src: 'photo4.jpg', cap: '📱 Жмёт ногами и листает ленту. Профессионал.' },
+  { src: 'photo6.jpg', cap: '� Смотрит на мир с прищуром. Мир нервничает.' },
+  { src: 'photo7.jpg', cap: '🎆 Два друга. Фейерверк. Именно так и выглядит настоящая дружба. ❤️' },
+  { src: 'photo8.jpg', cap: '😍 Красоточка' },
+];
+
+let lbIndex = 0;
+
+function openLightbox(i) {
+  lbIndex = i;
+  renderLightbox();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeLightboxOutside(e) {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+}
+
+function navLightbox(dir) {
+  lbIndex = (lbIndex + dir + lbPhotos.length) % lbPhotos.length;
+  renderLightbox();
+}
+
+function renderLightbox() {
+  const p = lbPhotos[lbIndex];
+  document.getElementById('lb-img').src         = p.src;
+  document.getElementById('lb-caption').textContent = p.cap;
+}
+
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'Escape')      closeLightbox();
+  if (e.key === 'ArrowRight')  navLightbox(1);
+  if (e.key === 'ArrowLeft')   navLightbox(-1);
+});
+/* ════════════════════════════════
+   ТАЙМЕР ЖИЗНИ
+════════════════════════════════ */
+// Дата рождения Никиты: 3 мая 2006
+const BIRTHDAY = new Date(2006, 4, 3); // 3 мая 2006
+
+function updateTimer() {
+  const now   = new Date();
+
+  // Следующий день рождения
+  const nextBD = new Date(now.getFullYear(), 4, 3); // 3 мая текущего года
+  if (nextBD < now) nextBD.setFullYear(nextBD.getFullYear() + 1);
+  const msUntilBD = nextBD - now;
+  const daysUntil = Math.floor(msUntilBD / 86400000);
+
+  const isBirthday = now.getMonth() === 4 && now.getDate() === 3;
+
+  if (isBirthday) {
+    // Сегодня ДР!
+    document.querySelector('.timer-section h2').textContent = '🎂 Сегодня День Рождения!';
+    document.getElementById('timer-sub-text').textContent = 'Никита, с 20-летием! 🎉';
+  } else if (daysUntil <= 9) {
+    // Скоро ДР — показываем обратный отсчёт
+    document.querySelector('.timer-section h2').textContent = '🎂 До 20-летия Никиты...';
+    document.getElementById('timer-sub-text').textContent = 'Совсем скоро! Готовься!';
+
+    const h = Math.floor((msUntilBD % 86400000) / 3600000);
+    const m = Math.floor((msUntilBD % 3600000) / 60000);
+    const s = Math.floor((msUntilBD % 60000) / 1000);
+
+    document.getElementById('t-years').textContent = daysUntil;
+    document.getElementById('t-days').parentElement.querySelector('.timer-label').textContent = 'дней';
+    document.getElementById('t-days').textContent  = String(h).padStart(2,'0');
+    document.getElementById('t-hours').textContent = String(m).padStart(2,'0');
+    document.getElementById('t-mins').textContent  = String(s).padStart(2,'0');
+    document.getElementById('t-secs').textContent  = '🎈';
+
+    document.querySelector('#t-years + .timer-label').textContent = 'дней';
+    document.querySelector('#t-days + .timer-label').textContent  = 'часов';
+    document.querySelector('#t-hours + .timer-label').textContent = 'минут';
+    document.querySelector('#t-mins + .timer-label').textContent  = 'секунд';
+    document.querySelector('#t-secs + .timer-label').textContent  = '';
+    return;
+  } else {
+    document.querySelector('.timer-section h2').textContent = '⏱️ Никита живёт уже...';
+    document.getElementById('timer-sub-text').textContent = 'Тикает каждую секунду';
+  }
+
+  const diff  = now - BIRTHDAY;
+  const totalSecs  = Math.floor(diff / 1000);
+  const totalMins  = Math.floor(diff / 60000);
+  const totalHours = Math.floor(diff / 3600000);
+  const totalDays  = Math.floor(diff / 86400000);
+  const years      = Math.floor(totalDays / 365.25);
+  const remDays    = Math.floor(totalDays - years * 365.25);
+  const remHours   = totalHours - Math.floor(totalDays * 24);
+  const remMins    = totalMins  - totalHours * 60;
+  const remSecs    = totalSecs  - totalMins  * 60;
+
+  document.getElementById('t-years').textContent = years;
+  document.getElementById('t-days').textContent  = remDays;
+  document.getElementById('t-hours').textContent = remHours;
+  document.getElementById('t-mins').textContent  = String(remMins).padStart(2,'0');
+  document.getElementById('t-secs').textContent  = String(remSecs).padStart(2,'0');
+
+  document.querySelector('#t-years + .timer-label').textContent = 'лет';
+  document.querySelector('#t-days + .timer-label').textContent  = 'дней';
+  document.querySelector('#t-hours + .timer-label').textContent = 'часов';
+  document.querySelector('#t-mins + .timer-label').textContent  = 'минут';
+  document.querySelector('#t-secs + .timer-label').textContent  = 'секунд';
+}
+
+updateTimer();
+setInterval(updateTimer, 1000);
+
+/* ════════════════════════════════
+   ФАКТЫ
+════════════════════════════════ */
+function revealFact(card) {
+  card.classList.toggle('revealed');
+}
+
+/* ════════════════════════════════
+   ФЕЙЕРВЕРК
+════════════════════════════════ */
+const fwCanvas = document.getElementById('fw-canvas');
+const fwCtx    = fwCanvas.getContext('2d');
+let fwRockets  = [];
+let fwActive   = false;
+let fwTimer    = null;
+
+function resizeFW() {
+  fwCanvas.width  = window.innerWidth;
+  fwCanvas.height = window.innerHeight;
+}
+resizeFW();
+window.addEventListener('resize', resizeFW);
+
+const FW_COLORS = [
+  '#ff6fd8','#ffd700','#7ef7ff','#a78bfa',
+  '#34d399','#f97316','#fff','#ff4444','#44ffaa'
+];
+
+function launchRocket() {
+  const x = Math.random() * fwCanvas.width * 0.8 + fwCanvas.width * 0.1;
+  const targetY = Math.random() * fwCanvas.height * 0.45 + 60;
+  const color   = FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)];
+  fwRockets.push({
+    x, y: fwCanvas.height + 10,
+    targetY,
+    vy: -(fwCanvas.height - targetY) / 40,
+    color,
+    trail: [],
+    exploded: false,
+    particles: [],
+  });
+}
+
+function explodeRocket(r) {
+  r.exploded = true;
+  const count = 80 + Math.floor(Math.random() * 60);
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i + Math.random() * 0.3;
+    const spd   = Math.random() * 5 + 2;
+    const col   = Math.random() < 0.3
+      ? FW_COLORS[Math.floor(Math.random() * FW_COLORS.length)]
+      : r.color;
+    r.particles.push({
+      x: r.x, y: r.y,
+      vx: Math.cos(angle) * spd,
+      vy: Math.sin(angle) * spd,
+      life: 1,
+      decay: Math.random() * 0.018 + 0.012,
+      r: Math.random() * 3 + 1,
+      color: col,
+    });
+  }
+}
+
+function fwLoop() {
+  if (!fwActive) return;
+
+  fwCtx.fillStyle = 'rgba(0,0,0,0.18)';
+  fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+  fwRockets = fwRockets.filter(r => {
+    if (!r.exploded) {
+      // Движение ракеты
+      r.trail.push({ x: r.x, y: r.y });
+      if (r.trail.length > 12) r.trail.shift();
+
+      // Хвост
+      r.trail.forEach((pt, i) => {
+        fwCtx.save();
+        fwCtx.globalAlpha = (i / r.trail.length) * 0.6;
+        fwCtx.fillStyle = r.color;
+        fwCtx.beginPath();
+        fwCtx.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+        fwCtx.fill();
+        fwCtx.restore();
+      });
+
+      // Голова
+      fwCtx.save();
+      fwCtx.shadowColor = r.color;
+      fwCtx.shadowBlur  = 10;
+      fwCtx.fillStyle   = '#fff';
+      fwCtx.beginPath();
+      fwCtx.arc(r.x, r.y, 3, 0, Math.PI * 2);
+      fwCtx.fill();
+      fwCtx.restore();
+
+      r.y += r.vy;
+      if (r.y <= r.targetY) explodeRocket(r);
+      return true;
+    }
+
+    // Частицы взрыва
+    r.particles = r.particles.filter(p => {
+      fwCtx.save();
+      fwCtx.globalAlpha = p.life;
+      fwCtx.shadowColor = p.color;
+      fwCtx.shadowBlur  = 6;
+      fwCtx.fillStyle   = p.color;
+      fwCtx.beginPath();
+      fwCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      fwCtx.fill();
+      fwCtx.restore();
+
+      p.x    += p.vx;
+      p.y    += p.vy;
+      p.vy   += 0.08;
+      p.vx   *= 0.98;
+      p.life -= p.decay;
+      return p.life > 0;
+    });
+
+    return r.particles.length > 0;
+  });
+
+  requestAnimationFrame(fwLoop);
+}
+
+function launchFireworks() {
+  fwCanvas.style.display = 'block';
+  fwActive = true;
+  fwRockets = [];
+  fwLoop();
+
+  // Запускаем серию ракет
+  let count = 0;
+  const burst = () => {
+    const n = Math.floor(Math.random() * 3) + 1;
+    for (let i = 0; i < n; i++) launchRocket();
+    count++;
+    if (count < 18) {
+      fwTimer = setTimeout(burst, Math.random() * 400 + 150);
+    } else {
+      // Финальный залп
+      setTimeout(() => {
+        for (let i = 0; i < 8; i++) setTimeout(launchRocket, i * 120);
+        setTimeout(() => {
+          fwActive = false;
+          fwCanvas.style.display = 'none';
+        }, 5000);
+      }, 500);
+    }
+  };
+  burst();
+}
+</script>
+</body>
+</html>
