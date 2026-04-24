@@ -124,36 +124,38 @@
     .game-section {
       position: relative;
       z-index: 1;
-      padding: 4rem 1.5rem 3rem;
+      padding: 2rem 1rem 2rem;
       background: radial-gradient(ellipse at center, #0a1a33 0%, #0d0d1a 80%);
       text-align: center;
     }
 
     .game-section h2 {
-      font-size: 2rem;
+      font-size: clamp(1.3rem, 5vw, 2rem);
       margin-bottom: 0.4rem;
       color: #ffd700;
     }
 
     .game-section .game-desc {
       color: #aaa;
-      margin-bottom: 1.25rem;
-      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      font-size: clamp(0.8rem, 3vw, 0.95rem);
+      padding: 0 0.5rem;
     }
 
     .game-hud {
       display: flex;
       justify-content: center;
-      gap: 2.5rem;
+      gap: 1.2rem;
       margin-bottom: 0.75rem;
-      font-size: 1rem;
+      font-size: clamp(0.8rem, 3vw, 1rem);
       color: #ccc;
+      flex-wrap: wrap;
     }
 
     .game-hud .val {
       color: #ffd700;
       font-weight: bold;
-      font-size: 1.3rem;
+      font-size: clamp(1rem, 4vw, 1.3rem);
     }
 
     #game-canvas {
@@ -163,6 +165,7 @@
       border: 2px solid #2a1a5a;
       background: #07071a;
       touch-action: none;
+      max-width: 100%;
     }
 
     .game-start-overlay {
@@ -177,7 +180,7 @@
       border-radius: 12px;
       color: #fff;
       padding: 0.8rem 2.5rem;
-      font-size: 1.05rem;
+      font-size: clamp(0.95rem, 4vw, 1.05rem);
       cursor: pointer;
       transition: opacity 0.2s;
     }
@@ -193,8 +196,8 @@
     }
 
     .game-over-box .go-emoji { font-size: 3.5rem; }
-    .game-over-box h3 { font-size: 1.4rem; color: #ffd700; }
-    .game-over-box p  { color: #aaa; font-size: 0.95rem; }
+    .game-over-box h3 { font-size: clamp(1.1rem, 4vw, 1.4rem); color: #ffd700; }
+    .game-over-box p  { color: #aaa; font-size: clamp(0.85rem, 3vw, 0.95rem); }
 
     .play-again-btn {
       background: linear-gradient(90deg, #ff6fd8, #ffd700);
@@ -213,7 +216,7 @@
     /* Мобильные кнопки */
     .mobile-controls {
       display: none;
-      gap: 1.5rem;
+      gap: 2rem;
       justify-content: center;
       margin-top: 0.75rem;
     }
@@ -224,8 +227,8 @@
       border-radius: 12px;
       color: #fff;
       font-size: 2rem;
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
@@ -242,36 +245,36 @@
     .gallery-section {
       position: relative;
       z-index: 1;
-      padding: 5rem 1.5rem 4rem;
+      padding: 3rem 1rem 3rem;
       background: #0d0d1a;
       text-align: center;
     }
 
     .gallery-section h2 {
-      font-size: 2rem;
+      font-size: clamp(1.4rem, 5vw, 2rem);
       color: #ff6fd8;
       margin-bottom: 0.4rem;
     }
 
     .gallery-section .gallery-sub {
       color: #888;
-      font-size: 0.95rem;
-      margin-bottom: 3rem;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
     }
 
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
+      gap: 1rem;
       max-width: 960px;
       margin: 0 auto;
     }
 
     @media (max-width: 700px) {
-      .photo-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .photo-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     }
     @media (max-width: 420px) {
-      .photo-grid { grid-template-columns: 1fr; }
+      .photo-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
     }
 
     .photo-card {
@@ -295,11 +298,15 @@
 
     .photo-card img {
       width: 100%;
-      height: 280px;
+      height: 200px;
       object-fit: cover;
       display: block;
       filter: brightness(0.88);
       transition: filter 0.3s;
+    }
+
+    @media (max-width: 420px) {
+      .photo-card img { height: 150px; }
     }
 
     .photo-card:hover img {
@@ -400,43 +407,48 @@
     }
 
     .lightbox-nav:hover { background: rgba(255,255,255,0.18); }
-    .lightbox-nav.prev { left: 1rem; }
-    .lightbox-nav.next { right: 1rem; }
+    .lightbox-nav.prev { left: 0.3rem; }
+    .lightbox-nav.next { right: 0.3rem; }
+
+    @media (max-width: 500px) {
+      .lightbox-nav { width: 40px; height: 40px; font-size: 1.8rem; }
+      .lightbox-caption { font-size: 0.85rem; }
+    }
 
     /* ── Таймер ── */
     .timer-section {
       position: relative;
       z-index: 1;
-      padding: 4rem 1.5rem;
+      padding: 3rem 1rem;
       background: radial-gradient(ellipse at center, #0d1f0d 0%, #0d0d1a 80%);
       text-align: center;
     }
 
     .timer-section h2 {
-      font-size: 1.8rem;
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
       color: #34d399;
       margin-bottom: 0.4rem;
     }
 
     .timer-section .timer-sub {
       color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
     }
 
     .timer-grid {
       display: flex;
       justify-content: center;
-      gap: 1.5rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
     }
 
     .timer-box {
       background: linear-gradient(135deg, #0a2a1a, #0d1f0d);
       border: 1px solid #22c55e44;
-      border-radius: 20px;
-      padding: 1.5rem 2rem;
-      min-width: 110px;
+      border-radius: 16px;
+      padding: 1rem 0.8rem;
+      min-width: 64px;
       position: relative;
       overflow: hidden;
     }
@@ -449,7 +461,7 @@
     }
 
     .timer-num {
-      font-size: 3rem;
+      font-size: clamp(1.8rem, 6vw, 3rem);
       font-weight: 900;
       color: #34d399;
       line-height: 1;
@@ -458,11 +470,11 @@
     }
 
     .timer-label {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       color: #4ade80;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-top: 0.4rem;
+      letter-spacing: 1px;
+      margin-top: 0.3rem;
       opacity: 0.7;
     }
 
@@ -470,13 +482,13 @@
     .facts-section {
       position: relative;
       z-index: 1;
-      padding: 4rem 1.5rem;
+      padding: 3rem 1rem;
       background: #0d0d1a;
       text-align: center;
     }
 
     .facts-section h2 {
-      font-size: 1.8rem;
+      font-size: clamp(1.3rem, 5vw, 1.8rem);
       color: #7ef7ff;
       margin-bottom: 0.4rem;
     }
@@ -484,15 +496,19 @@
     .facts-section .facts-sub {
       color: #666;
       font-size: 0.9rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .facts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem;
       max-width: 900px;
       margin: 0 auto;
+    }
+
+    @media (max-width: 500px) {
+      .facts-grid { grid-template-columns: 1fr; }
     }
 
     .fact-card {
@@ -967,15 +983,41 @@ animateConfetti();
 /* ════════════════════════════════
    ИГРА — ЛОВИ ПОДАРКИ
 ════════════════════════════════ */
-const gc      = document.getElementById('game-canvas');
-const gctx    = gc.getContext('2d');
+const gc   = document.getElementById('game-canvas');
+const gctx = gc.getContext('2d');
 
-const GW = gc.width;
+// Адаптируем размер canvas под экран
+function resizeGameCanvas() {
+  const maxW = Math.min(560, window.innerWidth - 24);
+  gc.style.width  = maxW + 'px';
+  gc.style.height = Math.round(maxW * (380 / 560)) + 'px';
+}
+resizeGameCanvas();
+window.addEventListener('resize', resizeGameCanvas);
+
+const GW = gc.width;   // внутренние пиксели всегда 560×380
 const GH = gc.height;
 
-// Эмодзи для падающих предметов
+// Эмодзи — рисуем через offscreen div чтобы работало на iOS/Android
 const GOOD_ITEMS = ['🎂','🎁','🎈','🍰','⭐','🎊'];
-const BAD_ITEMS  = ['💣','🌧️','😈'];
+const BAD_ITEMS  = ['💣','�️','😈'];
+
+// Кэш эмодзи-изображений
+const emojiCache = {};
+function getEmojiImg(emoji, size) {
+  const key = emoji + size;
+  if (emojiCache[key]) return emojiCache[key];
+  const offscreen = document.createElement('canvas');
+  offscreen.width  = size * 2;
+  offscreen.height = size * 2;
+  const ctx2 = offscreen.getContext('2d');
+  ctx2.font = `${size * 1.6}px serif`;
+  ctx2.textAlign    = 'center';
+  ctx2.textBaseline = 'middle';
+  ctx2.fillText(emoji, size, size);
+  emojiCache[key] = offscreen;
+  return offscreen;
+}
 
 // Состояние
 let gameRunning = false;
@@ -1102,13 +1144,11 @@ function drawBasket(x) {
 }
 
 function drawItem(item) {
+  const img = getEmojiImg(item.emoji, item.size);
   gctx.save();
   gctx.translate(item.x, item.y);
   gctx.rotate(item.rot);
-  gctx.font = `${item.size}px serif`;
-  gctx.textAlign = 'center';
-  gctx.textBaseline = 'middle';
-  gctx.fillText(item.emoji, 0, 0);
+  gctx.drawImage(img, -item.size, -item.size, item.size * 2, item.size * 2);
   gctx.restore();
 }
 
@@ -1285,9 +1325,9 @@ function endGame() {
 
 // Показываем canvas сразу (пустой), кнопка поверх
 gc.style.display = 'block';
+resizeGameCanvas();
 drawBackground();
-// Надпись на старте
-gctx.font = 'bold 22px Segoe UI';
+gctx.font = 'bold 22px Segoe UI, Arial, sans-serif';
 gctx.fillStyle = 'rgba(255,255,255,0.25)';
 gctx.textAlign = 'center';
 gctx.fillText('Нажми «Начать игру»!', GW / 2, GH / 2);
